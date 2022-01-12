@@ -2,12 +2,11 @@ package com.example.lab6_3
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.*
 import java.net.URL
 
 
@@ -26,12 +25,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCoolImage() {
-        MainScope().launch {
-            val image = withContext(Dispatchers.IO) {
-                BitmapFactory.decodeStream(urlImage.openStream())
-            }
-            imageView.post {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d("Working thread1: ", Thread.currentThread().name)
+            val image = BitmapFactory.decodeStream(urlImage.openStream())
+            withContext(Dispatchers.Main) {
                 imageView.setImageBitmap(image)
+                Log.d("Working thread2: ", Thread.currentThread().name)
             }
         }
     }
